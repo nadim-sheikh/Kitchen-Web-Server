@@ -17,6 +17,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         const foodCollection = client.db("rifat-kitchen").collection('food-item');
+        const reviewCollection = client.db("rifat-kitchen").collection('review');
 
         app.get('/limitFoodItem', async(req, res)=>{
             const cursor = foodCollection.find({});
@@ -33,6 +34,35 @@ async function run() {
             const query = {_id: ObjectId(id)};
             const food = await foodCollection.findOne(query);
             res.send(food);
+        })
+        app.post('/FoodItem', async(req, res)=>{
+            const addFood = req.body;
+            const result = await foodCollection.insertOne(addFood);
+            res.send(result);
+        })
+        app.get('/review', async(req, res)=>{
+            let query = {}
+            if(req.query.email){
+                query = {
+                    email: req.query.email
+                }
+            }
+            const cursor = reviewCollection.find(query);
+            const review = await cursor.toArray();
+            res.send(review);
+        })
+        app.post('/review', async(req, res)=>{
+            const addReview = req.body;
+            const result = await reviewCollection.insertOne(addReview);
+            res.send(result);
+        })
+        
+        app.patch('/review/:id', async(req, res)=>{
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)}
+            const addReview = req.body;
+            const result = await reviewCollection.insertOne(addReview);
+            res.send(result);
         })
     }
     finally {
